@@ -1,0 +1,30 @@
+# Build stage
+FROM node:18-alpine as build 
+
+WORKDIR /app
+
+# Copy package files
+COPY ./package.json ./
+
+# Install dependencies
+RUN npm ci --prefer-offline --no-audit --loglevel=error || \
+    (rm -rf node_modules package-lock.json && npm install)
+
+# Copy source code
+COPY . .
+
+# Build the app
+RUN npm run build
+
+# Production stage
+FROM nginx:alpine
+
+# Copy built app to nginx - REFER TO THE STAGE AS 'build'
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copy nginx configuration (optional - for custom config)
+# COPY nginx.conf /etc/nginx/nginx.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

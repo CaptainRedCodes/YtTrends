@@ -1,0 +1,58 @@
+# Core FastAPI and ASGI server
+fastapi==0.115.14
+uvicorn==0.35.0
+starlette==0.46.2 # dependency of fastapi
+
+# Database dependencies
+sqlalchemy==2.0.41
+psycopg==3.2.9
+psycopg-binary==3.2.9 # Both psycopg and psycopg-binary can be included, binary is for convenience
+
+# Pydantic (data validation/serialization)
+pydantic==2.11.7
+pydantic_core==2.33.2 # dependency of pydantic
+annotated-types==0.7.0 # dependency of pydantic
+
+# Environment variables
+python-dotenv==1.1.1
+
+# Google API Client for YouTube Data API
+google-api-python-client==2.174.0
+google-auth==2.40.3
+google-auth-httplib2==0.2.0
+google-auth-oauthlib==1.2.2
+googleapis-common-protos==1.70.0
+httplib2==0.22.0 # dependency of google-auth-httplib2
+oauthlib==3.3.1 # dependency of google-auth-oauthlib
+proto-plus==1.26.1 # dependency of googleapis-common-protos
+protobuf==6.31.1 # dependency of googleapis-common-protos
+pyasn1==0.6.1 # dependency of google-auth
+pyasn1_modules==0.4.2 # dependency of google-auth
+rsa==4.9.1 # dependency of google-auth
+
+# Background tasks/scheduling replacement for fastapi-utils
+fastapi-utilities==0.2.0 # NEW dependency
+
+# Utilities and dependencies that might be used by FastAPI or its components
+anyio==4.9.0
+h11==0.16.0 # for httpx/httpcore
+httpcore==1.0.9 # for httpx
+httpx==0.28.1 # for async http requests (might be pulled by other deps)
+idna==3.10 # for requests
+requests==2.32.4
+requests-oauthlib==2.0.0 # for google-auth-oauthlib
+sniffio==1.3.1 # for anyio
+typing_extensions==4.14.0 # commonly used for typing hints
+
+# Basic utilities (often pulled by other libraries)
+certifi==2025.6.15
+charset-normalizer==3.4.2
+urllib3==2.5.0
+packaging==25.0 # for dependency resolution
+six==1.17.0 # legacy dependency for some libraries
+
+# Remaining potential utilities you might use or were dependencies
+SQLAlchemy==2.0.41 # already listed, but ensuring it's clear
+greenlet==3.2.3 # for SQLAlchemy async
+Jinja2==3.1.6 # if you use templating, otherwise remove
+MarkupSafe==3.0.2 # dependency of Jinja2
