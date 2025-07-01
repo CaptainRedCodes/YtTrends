@@ -2,6 +2,9 @@
 # Use a slim Python image for smaller size
 FROM python:3.10-slim
 
+ARG API_KEY
+ENV API_KEY=$API_KEY
+
 WORKDIR /app_root 
 # Copy only the requirements file first for caching
 COPY ./requirements.txt .
