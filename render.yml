@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: fastapi-backend
+    env: docker
+    repo: https://github.com/CaptainRedCodes/YtTrends
+    dockerfilePath: app/Dockerfile
+    buildCommand: ""
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    envVars:
+      - key: YOUTUBE_API_KEY
+        fromSecret: YOUTUBE_API_KEY
+      - key: DATABASE_URL
+        fromDatabase:
+          name: yt-db
+
+  - type: web
+    name: node-frontend
+    env: docker
+    repo: https://CaptainRedCodes/YtTrends
+    dockerfilePath: frontend/Dockerfile
+    buildCommand: ""
+    startCommand: npm start
+    envVars: []
+
+databases:
+  - name: yt-db
+    databaseName: youtube_trends
+    user: user
