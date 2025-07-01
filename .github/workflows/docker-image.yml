@@ -20,6 +20,8 @@ jobs:
       - name: Build Docker Images
         run: |
           docker compose build
+        env:
+          API_KEYS: ${{ secrets.API_KEY }}
 
       - name: Run Containers
         run: |
