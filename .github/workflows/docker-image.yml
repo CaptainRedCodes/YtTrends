@@ -8,41 +8,55 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest 
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3 
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker Images
-        run: |
-          docker compose build
+        run: docker compose build
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
 
-      - name: Run Containers
-        run: |
-          docker compose up -d
+      - name: Run Containers in Background
+        run: docker compose up -d
 
-      - name: Check FastAPI is up
-        run: |
-          curl --retry 10 --retry-connrefused http://localhost:8000/docs
+      - name: Wait for FastAPI to be up and healthy
+        uses: bahmutov/start-server-and-test@v1
+        with:
+          # A dummy command, as the containers are already started by 'docker compose up -d'.
+          # The main purpose here is to wait for the URL.
+          command: echo "Containers started, waiting for FastAPI..."
+          # The URL to poll until it returns a successful response (HTTP 2xx).
+          wait-on: http://localhost:8000/docs
+          # Maximum time (in seconds) to wait for the URL to become available.
+          # Increased to 3 minutes to allow for potential slow startup or API calls.
+          timeout: 180
+          args: echo "FastAPI is ready and accessible!"
 
-      - name: Show FastAPI Logs
-        run: docker logs $(docker ps -qf "name=web")
+      - name: Show FastAPI Logs (for debugging if previous step failed)
+        if: failure()
+        run: docker compose logs web
+        continue-on-error: true
+
+      - name: Wait for Node App to be up and healthy
+        uses: bahmutov/start-server-and-test@v1
+        with:
+          command: echo "Waiting for Node App..."
+          wait-on: http://localhost:3000
+          timeout: 120 # Timeout for Node app startup
+          args: echo "Node App is ready and accessible!"
+
+      - name: Show Node App Logs (for debugging if previous step failed)
+        if: failure()
+        run: docker compose logs client
         continue-on-error: true
 
 
-      - name: Check Node App is up
-        run: |
-          curl --retry 10 --retry-connrefused http://localhost:3000
-
-      # Test
-      # - name: Run Backend Tests
-      #   run: docker exec backend pytest
-
-      - name: Tear Down
-        run: docker compose down
+      - name: Tear Down Containers
+        if: always()
+        run: docker compose down --volumes --remove-orphans
