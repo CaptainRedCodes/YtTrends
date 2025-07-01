@@ -33,6 +33,7 @@ jobs:
 
       - name: Show FastAPI Logs
         run: docker logs $(docker ps -qf "name=web")
+        continue-on-error: true
 
 
       - name: Check Node App is up
