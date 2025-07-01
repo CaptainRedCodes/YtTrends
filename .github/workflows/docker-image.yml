@@ -31,6 +31,10 @@ jobs:
         run: |
           curl --retry 10 --retry-connrefused http://localhost:8000/docs
 
+      - name: Show FastAPI Logs
+        run: docker logs $(docker ps -qf "name=web")
+
+
       - name: Check Node App is up
         run: |
           curl --retry 10 --retry-connrefused http://localhost:3000
