@@ -47,7 +47,7 @@ jobs:
       - name: Check Node App is up (with retries)
         run: |
           for i in {1..30}; do
-            if curl -f http://localhost:3000; then
+            if curl -f http://localhost/; then
               echo "Node App is up!"
               break
             fi
