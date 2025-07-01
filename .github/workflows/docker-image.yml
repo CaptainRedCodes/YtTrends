@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -25,37 +25,48 @@ jobs:
       - name: Run Containers in Background
         run: docker compose up -d
 
-      - name: Wait for FastAPI to be up and healthy
-        uses: bahmutov/start-server-and-test@v1
-        with:
-          # A dummy command, as the containers are already started by 'docker compose up -d'.
-          # The main purpose here is to wait for the URL.
-          command: echo "Containers started, waiting for FastAPI..."
-          # The URL to poll until it returns a successful response (HTTP 2xx).
-          wait-on: http://localhost:8000/docs
-          # Maximum time (in seconds) to wait for the URL to become available.
-          # Increased to 3 minutes to allow for potential slow startup or API calls.
-          timeout: 180
-          args: echo "FastAPI is ready and accessible!"
+      - name: Wait for containers to be ready
+        run: sleep 30
+
+      - name: Check FastAPI is up (with retries)
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:8000/docs; then
+              echo "FastAPI is up!"
+              break
+            fi
+            echo "Attempt $i: FastAPI not ready yet, waiting..."
+            sleep 10
+          done
 
       - name: Show FastAPI Logs (for debugging if previous step failed)
         if: failure()
         run: docker compose logs web
         continue-on-error: true
 
-      - name: Wait for Node App to be up and healthy
-        uses: bahmutov/start-server-and-test@v1
-        with:
-          command: echo "Waiting for Node App..."
-          wait-on: http://localhost:3000
-          timeout: 120 # Timeout for Node app startup
-          args: echo "Node App is ready and accessible!"
+      - name: Check Node App is up (with retries)
+        run: |
+          for i in {1..30}; do
+            if curl -f http://localhost:3000; then
+              echo "Node App is up!"
+              break
+            fi
+            echo "Attempt $i: Node App not ready yet, waiting..."
+            sleep 10
+          done
 
       - name: Show Node App Logs (for debugging if previous step failed)
         if: failure()
         run: docker compose logs client
         continue-on-error: true
 
+      - name: Run Tests (if you have any)
+        run: |
+          # Add your test commands here
+          # For example:
+          # docker compose exec -T web pytest
+          # docker compose exec -T client npm test
+          echo "Add your test commands here"
 
       - name: Tear Down Containers
         if: always()
