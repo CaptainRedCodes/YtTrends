@@ -21,7 +21,7 @@ jobs:
         run: |
           docker compose build
         env:
-          API_KEYS: ${{ secrets.API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
 
       - name: Run Containers
         run: |
