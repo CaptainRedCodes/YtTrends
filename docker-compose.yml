@@ -20,13 +20,11 @@ services:
   web:
     build:
       context: .        # Build context
-      dockerfile: app/Dockerfile   # Dockerfile relative to context (so ./app/Dockerfile)
-      args:
-        API_KEY: ${API_KEY}
+      dockerfile: app/Dockerfile   
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - ./app:/app_root/app
-      - ./requirements.txt:/app_root/requirements.txt    # Mount the app directory (match your build context)
+      - ./requirements.txt:/app_root/requirements.txt    
     ports:
       - "8000:8000"
     depends_on:
@@ -35,8 +33,6 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://user:user123@db:5432/youtube_trends
       YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
-    env_file:
-      - ./.env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s
